@@ -1,0 +1,47 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace ScreeningWithText
+{
+    public partial class SentForm : Form
+    {
+        public SentForm()
+        {
+            InitializeComponent();
+        }
+        private void SentForm_Load(object sender, EventArgs e)
+        {
+            if (Application.OpenForms["Smile"] != null)
+            {
+                Smile toCloseSmile = (Smile)Application.OpenForms["Smile"];
+                toCloseSmile.Close();
+            }
+
+            if (Application.OpenForms["Frown"] != null)
+            {
+                Frown toCloseFrown = (Frown)Application.OpenForms["Frown"];
+                toCloseFrown.Close();
+            }
+            if (Application.OpenForms["BugReport"] != null)
+            {
+                BugReport toCloseBugReport = (BugReport)Application.OpenForms["BugReport"];
+                toCloseBugReport.Close();
+            }
+            
+        }
+
+        private void buttonOK_Click(object sender, EventArgs e)
+        {
+            SentForm toClose = (SentForm)Application.OpenForms["SentForm"];
+            toClose.Close();
+        }
+
+    }
+}
