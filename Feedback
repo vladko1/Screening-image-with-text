@@ -1,0 +1,45 @@
+using System.Configuration;
+using System.Data.SqlClient;
+using System.Windows.Forms;
+
+namespace ScreeningWithText
+{
+    class Feedback
+    {
+        //Get the conection string from config file
+        internal static string GetConnectionString()
+        {
+            string returnValue = null;
+            ConnectionStringSettings settings =
+            ConfigurationManager.ConnectionStrings["ScreeningWithText.Properties.Settings.ScreeningWithTextConnectionString"];
+            if (settings != null)
+                returnValue = settings.ConnectionString;
+
+            return returnValue;
+        }
+
+        internal static void insertData(string textToInsert)
+        {
+            System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
+            string connString = GetConnectionString();
+            SqlConnection conn = new SqlConnection(connString);
+
+            //Create a SqlCommand
+            SqlCommand cmd = new SqlCommand("Insert into Feedback (UserFeedback) Values (@Feedback)", conn);
+            cmd.Parameters.AddWithValue("@Feedback", textToInsert);
+            try
+            {
+                conn.Open();
+                cmd.ExecuteNonQuery();
+                conn.Close();
+            }
+            catch
+            {
+                MessageBox.Show("Sorry, your feedback can not be send at the moment.");
+            }
+            //Show another form to inform user that the feedback was sent successfully
+            SentForm sentForm = new SentForm();
+            sentForm.Show();
+        }
+    }
+}
