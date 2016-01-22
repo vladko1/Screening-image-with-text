@@ -1,0 +1,522 @@
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace ScreeningWithText
+{
+    public partial class Pictures : Form
+    {
+        Bitmap bmpIn, bmpOut;
+        int width, height, matrix, fontSize,  charCounter;
+        double pixelValue;
+        Graphics formGraphics;
+        Font myFont;
+        Brush textColor;
+        FontFamily fontType;
+        string textForScreening, imgPath;
+        char[] letters;
+        bool pictureLoaded;
+
+
+        public Pictures()
+        {
+            InitializeComponent();
+            textColor = Brushes.Black;
+            charCounter = 0;
+            matrix = 10;
+            fontSize = 14;
+            fontType = FontFamily.GenericSansSerif;
+            pictureLoaded = false;
+            buttonSave.Enabled = false;
+            saveToolStripMenuItem.Enabled = false;
+        }
+
+        private void Pictures_Load(object sender, EventArgs e)
+        {
+            //populating the comboboxes
+            //Combobox Fonts
+            comboBoxFonts.Text = "GenericSansSerif";
+            comboBoxFonts.Items.Add("GenericSansSerif");
+            comboBoxFonts.Items.Add("Times New Roman");
+            comboBoxFonts.Items.Add("Arial");
+            comboBoxFonts.Items.Add("Comic Sans MS");
+            comboBoxFonts.Items.Add("Verdana");
+            comboBoxFonts.Items.Add("Algerian");
+            comboBoxFonts.Items.Add("Broadway");
+            comboBoxFonts.SelectedItem = "GenericSansSerif";
+            //Combobox Font Size
+            comboBoxSize.Items.Add("14");
+            comboBoxSize.Items.Add("15");
+            comboBoxSize.Items.Add("16");
+            comboBoxSize.Items.Add("17");
+            comboBoxSize.Items.Add("18");
+            comboBoxSize.Items.Add("19");
+            comboBoxSize.Items.Add("20");
+            comboBoxSize.SelectedItem = "14";
+            //initialise the default value to show in comboboxes
+            FontsToolStripComboBox.SelectedIndex = 0;
+            FontSizeToolStripComboBox.SelectedIndex = 0;
+
+        }
+        //Load the input picture, used as a model for the screening
+        private void buttonLoad_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog loadPicture = new OpenFileDialog();
+            loadPicture.Filter = "Image Files (*.png, *.jpg, *bmp, *gif) | *.png; *.jpg; *bmp; *gif";
+
+            if (loadPicture.ShowDialog() == DialogResult.OK)
+            {
+                imgPath = loadPicture.FileName.ToString();
+                bmpIn = new Bitmap(imgPath);
+                width = bmpIn.Width;
+                height = bmpIn.Height;
+                pictureBoxIn.Image = bmpIn;
+                pictureLoaded = true;
+            }
+
+            //if output image was already displayed, change it dynamicaly
+            //by loading another picture
+            if (buttonSave.Enabled == true)
+            {
+                buttonShow.PerformClick();
+            }
+        }
+
+        //clear the initial text in textBox, when user gets focus on it
+        private void textBox_GotFocus(Object sender, EventArgs e)
+        {
+            if (textBox.Text == "Enter Some Text For The Screening")
+            {
+                textBox.Clear();
+                textBox.ForeColor = SystemColors.WindowText;
+            }
+            
+
+        }
+
+        //if output image was already displayed and the user change the text in the text box,
+        //change dynamicaly the output image
+        private void textBox_LostFocus(Object sender, EventArgs e)
+        {
+
+            //if (buttonSave.Enabled == true)
+            //{
+            //    buttonShow.PerformClick();
+            //}
+        }
+
+
+        //change the font of the text for screening
+        private void comboBoxFonts_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (comboBoxFonts.SelectedItem.ToString())
+            {
+                case "GenericSansSerif":
+                    fontType = FontFamily.GenericSansSerif;
+                    textBox.Font = new Font(fontType, fontSize,
+                FontStyle.Regular);
+                    FontsToolStripComboBox.SelectedIndex = 0;
+                    break;
+                case "Times New Roman":
+                    fontType = new FontFamily("Times New Roman");
+                    textBox.Font = new Font(fontType, fontSize,
+                FontStyle.Regular);
+                    FontsToolStripComboBox.SelectedIndex = 1;
+                    break;
+                case "Arial":
+                    fontType = new FontFamily("Arial");
+                    textBox.Font = new Font(fontType, fontSize,
+                FontStyle.Regular);
+                    FontsToolStripComboBox.SelectedIndex = 2;
+                    break;
+                case "Comic Sans MS":
+                    fontType = new FontFamily("Comic Sans MS");
+                    textBox.Font = new Font(fontType, fontSize,
+                FontStyle.Regular);
+                    FontsToolStripComboBox.SelectedIndex = 3;
+                    break;
+                case "Verdana":
+                    fontType = new FontFamily("Verdana");
+                    textBox.Font = new Font(fontType, fontSize,
+                FontStyle.Regular);
+                    FontsToolStripComboBox.SelectedIndex = 4;
+                    break;
+                case "Algerian":
+                    fontType = new FontFamily("Algerian");
+                    textBox.Font = new Font(fontType, fontSize,
+                FontStyle.Regular);
+                    FontsToolStripComboBox.SelectedIndex = 5;
+                    break;
+                case "Broadway":
+                    fontType = new FontFamily("Broadway");
+                    textBox.Font = new Font(fontType, fontSize,
+                FontStyle.Regular);
+                    FontsToolStripComboBox.SelectedIndex = 6;
+                    break;
+            }
+
+            //if output image was already displayed, change dynamicaly 
+            //the font of the text for screening and update the image
+
+            if (buttonSave.Enabled == true)
+            {
+                buttonShow.PerformClick();
+            }
+
+        }
+
+
+        // change the color of the text for screening
+        private void buttonTextColor_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDlg = new ColorDialog();
+            colorDlg.AllowFullOpen = false;
+            colorDlg.AnyColor = true;
+            colorDlg.SolidColorOnly = false;
+
+            if (colorDlg.ShowDialog() == DialogResult.OK)
+            {
+
+                textColor = new SolidBrush(colorDlg.Color);
+                textBox.ForeColor = colorDlg.Color;
+
+            }
+            //if output image was already displayed, change dynamicaly 
+            //the color of the text for screening and update the image
+            if (buttonSave.Enabled == true)
+            {
+                buttonShow.PerformClick();
+            }
+        }
+
+        //change the background color of the output image
+        private void buttonBackground_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDlg = new ColorDialog();
+
+            if (colorDlg.ShowDialog() == DialogResult.OK)
+            {
+                pictureBoxOut.BackColor = colorDlg.Color;
+                textBox.BackColor = colorDlg.Color;
+
+            }
+        }
+        //change the font size of the text for screening
+        //by selecting an item from combobox Font Size
+        private void comboBoxSize_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (comboBoxSize.SelectedItem.ToString())
+            {
+                case "14":
+                    fontSize = 14;
+                    textBox.Font = new Font(fontType, fontSize, FontStyle.Regular);
+                    FontSizeToolStripComboBox.SelectedIndex = 0;
+                    break;
+                case "15":
+                    fontSize = 15;
+                    textBox.Font = new Font(fontType, fontSize, FontStyle.Regular);
+                    FontSizeToolStripComboBox.SelectedIndex = 1;
+                    break;
+                case "16":
+                    fontSize = 16;
+                    textBox.Font = new Font(fontType, fontSize, FontStyle.Regular);
+                    FontSizeToolStripComboBox.SelectedIndex = 2;
+                    break;
+                case "17":
+                    fontSize = 17;
+                    textBox.Font = new Font(fontType, fontSize, FontStyle.Regular);
+                    FontSizeToolStripComboBox.SelectedIndex = 3;
+                    break;
+                case "18":
+                    fontSize = 18;
+                    textBox.Font = new Font(fontType, fontSize, FontStyle.Regular);
+                    FontSizeToolStripComboBox.SelectedIndex = 4;
+                    break;
+                case "19":
+                    fontSize = 19;
+                    textBox.Font = new Font(fontType, fontSize, FontStyle.Regular);
+                    FontSizeToolStripComboBox.SelectedIndex = 5;
+                    break;
+                case "20":
+                    fontSize = 20;
+                    textBox.Font = new Font(fontType, fontSize, FontStyle.Regular);
+                    FontSizeToolStripComboBox.SelectedIndex = 6;
+                    break;
+            }
+
+            //if output image was already displayed, change dynamicaly 
+            //the font size of the text for screening and update the image
+            if (buttonSave.Enabled == true)
+            {
+                buttonShow.PerformClick();
+            }
+        }
+
+
+        //Show the image from text in the picture box
+        private void buttonShow_Click(object sender, EventArgs e)
+        {
+            //check if an image is loaded and text for screening is provided
+
+            if (pictureLoaded == false)
+            {
+                MessageBox.Show("Please load a picture!", "No picture loaded", MessageBoxButtons.OK,
+            MessageBoxIcon.Information);
+                return;
+            }
+
+
+            if (textBox.Text == "" || textBox.Text == "Enter Some Text For The Screening")
+            {
+                MessageBox.Show("Please enter some text in the text box!", "No text entered", MessageBoxButtons.OK,
+            MessageBoxIcon.Information);
+                return;
+            }
+
+            transformText(); //prepare the input text for the screening
+            screeningWithText();//implement the algorithm for screening with text
+
+
+            buttonSave.Enabled = true;
+            saveToolStripMenuItem.Enabled = true;
+            myFont.Dispose();
+        }
+
+        //transform text for screening in uppercase text without white spaces
+        public void transformText()
+        {
+            textForScreening = textBox.Text.ToUpper();
+            textForScreening = textForScreening.Replace(" ", "");
+            letters = textForScreening.ToCharArray();
+        }
+
+        //scan evry pixel from loaded image
+        //set charachter with specific size
+        //in the output image according to the value of the color in the input image
+
+        public void screeningWithText()
+        {
+            System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
+
+            Pictures.ActiveForm.Enabled = false;
+
+            bmpOut = new Bitmap(width, height);
+            pictureBoxOut.Image = bmpOut;
+            formGraphics = Graphics.FromImage(bmpOut);
+            myFont = new Font(fontType, fontSize,
+            FontStyle.Regular);
+            formGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixel;
+
+            for (int y = 0; y < height; y += matrix)
+            {
+                charCounter = 0;
+                for (int x = 0; x < width; x += matrix)
+                {
+
+                    pixelValue = 0;
+
+                    //iterate through the matrix area to calculate average value of pixel
+                    for (int k = x; k < x + matrix && k < width; k++)
+                    {
+                        for (int m = y; m < y + matrix && m < height; m++)
+                        {
+                            pixelValue += bmpIn.GetPixel(k, m).R;
+                        }
+
+                    }
+
+                    pixelValue /= 100.0;
+
+
+                   // pixelValue = bmpIn.GetPixel(x, y).R;
+
+                    if (pixelValue >= 0 && pixelValue < 63)
+                    {
+
+                        formGraphics.DrawString(letters[charCounter].ToString(), myFont, textColor, x, y);
+                        charCounter = increaseCounter(charCounter);
+                    }
+                    if (pixelValue >= 63 && pixelValue < 127)
+                    {
+
+                        Font myFont1 = new Font(fontType, fontSize - 2,
+            FontStyle.Regular);
+                        formGraphics.DrawString(letters[charCounter].ToString(), myFont1, textColor, x, y);
+                        charCounter = increaseCounter(charCounter);
+                    }
+                    if (pixelValue >= 127 && pixelValue < 190)
+                    {
+
+                        Font myFont2 = new Font(fontType, fontSize - 4,
+             FontStyle.Regular);
+                        formGraphics.DrawString(letters[charCounter].ToString(), myFont2, textColor, x, y);
+                        charCounter = increaseCounter(charCounter);
+                    }
+                    if (pixelValue >= 190 && pixelValue < 256)
+                    {
+
+                        Font myFont3 = new Font(fontType, fontSize - 6,
+            FontStyle.Regular);
+                        formGraphics.DrawString(letters[charCounter].ToString(), myFont3, textColor, x, y);
+                        charCounter = increaseCounter(charCounter);
+                    }
+                }
+
+            }
+            Pictures.ActiveForm.Enabled = true;
+        }
+
+        //iterate through the char array
+        public int increaseCounter(int counter)
+        {
+            if (counter < letters.Length - 1)
+            {
+                counter++;
+                return counter;
+            }
+            else counter = 0;
+            return counter;
+        }
+
+        //save the output image as jpg, bmp, gif or png file
+        private void buttonSave_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif|Png Image|*.png";
+            saveFileDialog1.Title = "Save an Image File";
+            saveFileDialog1.ShowDialog();
+
+
+            if (saveFileDialog1.FileName != "")
+            {
+                //using blank bitmap to avoid issues by saving images
+
+                Bitmap blank = new Bitmap(width, height);
+                Graphics g = Graphics.FromImage(blank);
+                g.Clear(pictureBoxOut.BackColor); // clear the background color with the choosen color form the user 
+                g.DrawImage(bmpOut, 0, 0, width, height);
+
+                Bitmap tempImage = new Bitmap(blank);
+                blank.Dispose();
+
+                switch (saveFileDialog1.FilterIndex)
+                {
+                    case 1:
+                        tempImage.Save(saveFileDialog1.FileName, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        break;
+
+                    case 2:
+                        tempImage.Save(saveFileDialog1.FileName, System.Drawing.Imaging.ImageFormat.Bmp);
+                        break;
+
+                    case 3:
+                        tempImage.Save(saveFileDialog1.FileName, System.Drawing.Imaging.ImageFormat.Gif);
+                        break;
+                    case 4:
+                        tempImage.Save(saveFileDialog1.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                        break;
+                }
+
+                tempImage.Dispose();
+            }
+        }
+
+        //Menu of the form
+
+        private void loadPictureToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            buttonLoad.PerformClick();
+        }
+
+        private void showTextpictureToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            buttonShow.PerformClick();
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            buttonSave.PerformClick();
+        }
+
+        private void textColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            buttonTextColor.PerformClick();
+        }
+
+        private void backgroundColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            buttonBackground.PerformClick();
+        }
+
+        // by changing one of the comboboxes for Font Size
+        // dynamicale update the other one
+
+        private void FontSizeToolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string fontSize = FontSizeToolStripComboBox.Text;
+            comboBoxSize.SelectedItem = fontSize;
+        }
+        // by changing one of the comboboxes for Fonts
+        // dynamicale update the other one
+        private void FontsToolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string font = FontsToolStripComboBox.Text;
+            comboBoxFonts.SelectedItem = font;
+        }
+        //show the help 
+        private void viewHelpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormHelp review = new FormHelp();
+            review.Show();
+        }
+        //send feedback smile
+        private void sendASmileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Smile smile = new Smile();
+            smile.Show();
+        }
+        //send feedback frown
+        private void sendAFrownToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Frown frown = new Frown();
+            frown.Show();
+        }
+        //report a bug in the application
+        private void reportABugToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BugReport report = new BugReport();
+            report.Show();
+        }
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
