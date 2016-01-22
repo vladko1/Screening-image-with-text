@@ -1,0 +1,32 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace ScreeningWithText
+{
+    public partial class BugReport : Form
+    {
+        string bugReport;
+        public BugReport()
+        {
+            InitializeComponent();
+        }
+
+        private void buttonSendBug_Click(object sender, EventArgs e)
+        {
+            if (textBoxBug.Text != "")
+            {
+                bugReport = textBoxBug.Text;
+                ScreeningWithText.Feedback.insertData(bugReport);
+            }
+            else
+                MessageBox.Show("Please describe the bug you found in the text box above!");
+        }
+    }
+}
