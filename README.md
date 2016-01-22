@@ -1,5 +1,5 @@
 # Screening-image-with-text
-Windows forms application for Screening with text a given image (groups of pixels become replaced with text).
+Windows forms application for Screening with text a given image (groups of pixels become replaced with text). Please note that only the base clases were uploaded. Preparation is needed to run the application – create and design your own win forms application and use the uploaded classes as business logic layer.
 
 Welcome to Screening with text preview
 
